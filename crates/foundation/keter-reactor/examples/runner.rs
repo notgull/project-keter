@@ -3,11 +3,11 @@
 //! Run the reactor.
 
 keter_reactor::main! {
-    fn main(reactor: keter_reactor::Reactor) -> keter_reactor::End {
+    fn main(reactor: keter_reactor::Reactor) -> keter_reactor::Main {
         reactor.block_on(async { entry().await })
     }
 }
 
 async fn entry() -> ! {
-    std::future::pending().await
+    keter_reactor::exit().await
 }

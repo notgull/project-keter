@@ -21,6 +21,11 @@ macro_rules! main {
         fn main() {
             use $crate::platform::instantiation::ReactorExt as _;
 
+            // Eat the $sty and $res items to prevent unused warnings.
+            fn __eat_types(_: $sty) -> $res {
+                panic!()
+            }
+
             // Create the reactor and put it where we need it.
             let reactor = <$crate::Reactor as $crate::platform::instantiation::ReactorExt>::new();
             let $sett = reactor;
@@ -43,6 +48,14 @@ pub struct Finished {
     _private: (),
 }
 
+impl Finished {
+    fn new() -> Self {
+        Self {
+            _private: ()
+        }
+    }
+}
+
 /// Settings for the reactor to drive the system.
 pub struct Reactor {
     settings: sys::Settings,
@@ -52,9 +65,18 @@ impl Reactor {
     /// Block on a future for as long as possible.
     #[inline]
     pub fn block_on(self, future: impl Future<Output = Infallible>) -> Result<Finished> {
-        sys::block_on(self.settings, future)?;
-        Ok(Finished { _private: () })
+        if let Some(infall) = sys::block_on(self.settings, future)? {
+            match infall {} 
+        }
+        Ok(Finished::new())
     }
+}
+
+/// Indicate to the reactor that we want to exit as soon as possible.
+#[cold]
+pub async fn exit() -> ! {
+    sys::exit().expect("failed to exit the program");
+    std::future::pending().await
 }
 
 /// Check if a thread is the main thread.
