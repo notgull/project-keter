@@ -8,6 +8,7 @@ pub mod platform;
 mod sys;
 
 use std::convert::Infallible;
+use std::fmt;
 use std::future::Future;
 use std::io;
 use std::pin::Pin;
@@ -55,6 +56,13 @@ pub struct Finished {
     _private: (),
 }
 
+impl fmt::Debug for Finished {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Finished").finish_non_exhaustive()
+    }
+}
+
 impl Finished {
     fn new() -> Self {
         Self { _private: () }
@@ -64,6 +72,13 @@ impl Finished {
 /// Settings for the reactor to drive the system.
 pub struct Reactor {
     settings: sys::Settings,
+}
+
+impl fmt::Debug for Reactor {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Reactor").finish_non_exhaustive()
+    }
 }
 
 impl Reactor {
@@ -86,6 +101,13 @@ pub async fn exit() -> ! {
 
 /// A timer that waits for a specific amount of time in the run loop.
 pub struct Timer(sys::Timer);
+
+impl fmt::Debug for Timer {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Timer").finish_non_exhaustive()
+    }
+}
 
 impl Unpin for Timer {}
 
