@@ -27,8 +27,6 @@ macro_rules! main {
 
             // Run the block to get a result.
             let result = $bl;
-
-
         }
     };
 }
@@ -42,12 +40,12 @@ pub use io::Result;
 
 /// The type produced by a finished application.
 pub struct Finished {
-    _private: ()
+    _private: (),
 }
 
 /// Settings for the reactor to drive the system.
 pub struct Reactor {
-    settings: sys::Settings
+    settings: sys::Settings,
 }
 
 impl Reactor {
@@ -55,9 +53,7 @@ impl Reactor {
     #[inline]
     pub fn block_on(self, future: impl Future<Output = Infallible>) -> Result<Finished> {
         sys::block_on(self.settings, future)?;
-        Ok(Finished {
-            _private: ()
-        })
+        Ok(Finished { _private: () })
     }
 }
 
@@ -67,9 +63,26 @@ fn check_main_thread() -> io::Result<()> {
     if !sys::is_main_thread() {
         Err(io::Error::new(
             io::ErrorKind::Other,
-            "keter-reactor must be run on the same thread that called main()"
+            "keter-reactor must be run on the same thread that called main()",
         ))
     } else {
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[cfg(not(target_os = "android"))]
+    #[test]
+    fn not_allowed_on_any_thread() {
+        use crate::platform::instantiation::ReactorExt;
+
+        std::thread::spawn(|| {
+            assert!(Reactor::new().block_on(async { panic!() }).is_err());
+        })
+        .join()
+        .unwrap();
     }
 }

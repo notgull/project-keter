@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 authors = ["John Nunley <dev@notgull.net>"]
 
+[[test]]
+name = "reactor"
+path = "tests/reactor.rs"
+harness = false
+
 [dependencies]
 async-io = "2"
 
@@ -14,3 +19,4 @@ features = ["thread", "std", "process"]
 
 [dev-dependencies]
 futures-lite = "2.1.0"
+macro_rules_attribute = "0.2.0"

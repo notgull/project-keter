@@ -25,9 +25,7 @@ pub(crate) struct Settings {
 impl Settings {
     #[inline]
     pub(crate) fn empty() -> Self {
-        Self {
-            any_thread: false
-        }
+        Self { any_thread: false }
     }
 }
 
