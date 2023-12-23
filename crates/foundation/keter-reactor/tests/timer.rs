@@ -3,7 +3,7 @@
 use futures_lite::prelude::*;
 use keter_reactor::{exit, main, Main, Reactor, Timer};
 use macro_rules_attribute::apply;
-use web_time::{Instant, Duration};
+use web_time::{Duration, Instant};
 
 #[apply(main!)]
 fn main(reactor: Reactor) -> Main {

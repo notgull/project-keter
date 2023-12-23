@@ -5,6 +5,11 @@ edition = "2021"
 authors = ["John Nunley <dev@notgull.net>"]
 
 [[test]]
+name = "async_io"
+path = "tests/async_io.rs"
+harness = false
+
+[[test]]
 name = "reactor"
 path = "tests/reactor.rs"
 harness = false
