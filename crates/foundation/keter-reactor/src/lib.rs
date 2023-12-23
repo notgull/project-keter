@@ -10,6 +10,13 @@ mod sys;
 use std::convert::Infallible;
 use std::future::Future;
 use std::io;
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
+use futures_core::stream::Stream;
+use web_time::{Duration, Instant};
+
+pub use web_time;
 
 /// Macro for creating the main function.
 #[macro_export]
@@ -50,9 +57,7 @@ pub struct Finished {
 
 impl Finished {
     fn new() -> Self {
-        Self {
-            _private: ()
-        }
+        Self { _private: () }
     }
 }
 
@@ -66,7 +71,7 @@ impl Reactor {
     #[inline]
     pub fn block_on(self, future: impl Future<Output = Infallible>) -> Result<Finished> {
         if let Some(infall) = sys::block_on(self.settings, future)? {
-            match infall {} 
+            match infall {}
         }
         Ok(Finished::new())
     }
@@ -77,6 +82,108 @@ impl Reactor {
 pub async fn exit() -> ! {
     sys::exit().expect("failed to exit the program");
     std::future::pending().await
+}
+
+/// A timer that waits for a specific amount of time in the run loop.
+pub struct Timer(sys::Timer);
+
+impl Unpin for Timer {}
+
+impl Timer {
+    /// Create a new timer that never fires.
+    #[inline]
+    pub fn never() -> Self {
+        Self(sys::Timer::never())
+    }
+
+    /// Create a new timer that fires after a specific interval.
+    #[inline]
+    pub fn after(duration: Duration) -> Self {
+        Instant::now()
+            .checked_add(duration)
+            .map_or_else(Timer::never, Timer::at)
+    }
+
+    /// Create a new timer that fires at a specific deadline.
+    #[inline]
+    pub fn at(deadline: Instant) -> Self {
+        Self(sys::Timer::at(deadline))
+    }
+
+    /// Create a new timer that fires on an interval, starting now.
+    #[inline]
+    pub fn interval(period: Duration) -> Self {
+        Instant::now()
+            .checked_add(period)
+            .map_or_else(Timer::never, |start| Timer::interval_at(start, period))
+    }
+
+    /// Create a new timer that fires on an interval starting at a deadline.
+    #[inline]
+    pub fn interval_at(start: Instant, period: Duration) -> Self {
+        Self(sys::Timer::interval(start, period))
+    }
+
+    /// Set this timer to never fire.
+    #[inline]
+    pub fn set_never(&mut self) {
+        self.0.set_never();
+    }
+
+    /// Set this timer to fire after a specific duration, clearing any prior timer.
+    #[inline]
+    pub fn set_after(&mut self, after: Duration) {
+        match Instant::now().checked_add(after) {
+            None => self.set_never(),
+            Some(deadline) => self.set_at(deadline),
+        }
+    }
+
+    /// Set this timer to fire at a specific deadline, clearing any prior timer.
+    #[inline]
+    pub fn set_at(&mut self, deadline: Instant) {
+        self.0.set_at(deadline);
+    }
+
+    /// Set this timer to fire on an interval, clearing any prior timer.
+    #[inline]
+    pub fn set_interval(&mut self, period: Duration) {
+        match Instant::now().checked_add(period) {
+            None => self.set_never(),
+            Some(start) => self.set_interval_at(start, period),
+        }
+    }
+
+    /// Set this timer to fire on an interval starting at a specific deadline, clearing any
+    /// prior timer.
+    #[inline]
+    pub fn set_interval_at(&mut self, start: Instant, period: Duration) {
+        self.0.set_interval(start, period);
+    }
+}
+
+impl Future for Timer {
+    type Output = ();
+
+    #[inline]
+    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        self.0.poll(cx)
+    }
+}
+
+impl Stream for Timer {
+    type Item = ();
+
+    #[inline]
+    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        self.0.poll(cx).map(Some)
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        // This stream runs forever.
+        (usize::MAX, None)
+    }
 }
 
 /// Check if a thread is the main thread.

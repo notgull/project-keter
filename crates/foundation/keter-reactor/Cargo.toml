@@ -9,10 +9,17 @@ name = "reactor"
 path = "tests/reactor.rs"
 harness = false
 
+[[test]]
+name = "timer"
+path = "tests/timer.rs"
+harness = false
+
 [dependencies]
 async-io = "2"
 event-listener = "4.0.1"
+futures-core = { version = "0.3.29", default-features = false }
 futures-lite = { version = "2.1.0", default-features = false }
+web-time = "0.2.3"
 
 [target.'cfg(target_os = "linux")'.dependencies.rustix]
 version = "0.38.28"
