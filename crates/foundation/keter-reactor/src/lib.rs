@@ -2,6 +2,8 @@
 
 //! A reactor for driving GUI systems.
 
+#![forbid(unsafe_code)]
+
 pub mod platform;
 mod sys;
 
@@ -59,3 +61,15 @@ impl Reactor {
     }
 }
 
+/// Check if a thread is the main thread.
+#[inline]
+fn check_main_thread() -> io::Result<()> {
+    if !sys::is_main_thread() {
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            "keter-reactor must be run on the same thread that called main()"
+        ))
+    } else {
+        Ok(())
+    }
+}

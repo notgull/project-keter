@@ -1,2 +1,3 @@
 [workspace]
 members = ["crates/foundation/keter-reactor"]
+resolver = "2"
