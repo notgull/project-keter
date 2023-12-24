@@ -484,6 +484,7 @@ dependencies = [
  "event-listener",
  "futures-core",
  "futures-lite",
+ "keter-test",
  "macro_rules_attribute",
  "once_cell",
  "rustix",
@@ -496,6 +497,7 @@ version = "0.1.0"
 dependencies = [
  "async-net",
  "color-eyre",
+ "futures-lite",
  "human-panic",
  "inventory",
  "owo-colors 4.0.0",

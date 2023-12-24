@@ -4,20 +4,9 @@ version = "0.1.0"
 edition = "2021"
 authors = ["John Nunley <dev@notgull.net>"]
 
-[[test]]
-name = "async_io"
-path = "tests/async_io.rs"
-harness = false
-
-[[test]]
-name = "reactor"
-path = "tests/reactor.rs"
-harness = false
-
-[[test]]
-name = "timer"
-path = "tests/timer.rs"
-harness = false
+[[example]]
+name = "general_tests"
+path = "keter_tests/general_tests/main.rs"
 
 [dependencies]
 futures-core = { version = "0.3.29", default-features = false }
@@ -40,6 +29,7 @@ default-features = false
 features = ["thread", "std", "process"]
 
 [dev-dependencies]
+keter-test.workspace = true
 macro_rules_attribute = "0.2.0"
 
 [target.'cfg(target_os = "android")'.dev-dependencies]

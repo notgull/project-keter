@@ -1,3 +1,6 @@
 [workspace]
 members = ["crates/foundation/keter-reactor", "crates/testing/keter-test"]
 resolver = "2"
+
+[workspace.dependencies]
+keter-test = { path = "crates/testing/keter-test" }

@@ -32,7 +32,7 @@ macro_rules! main {
         }
 
         #[cfg(not(target_os = "android"))]
-        fn main() -> $res {
+        fn main() {
             use $crate::platform::instantiation::ReactorExt as _;
 
             // Create the reactor and put it where we need it.
@@ -41,7 +41,9 @@ macro_rules! main {
 
             // Run the block to get a result.
             let result = $bl;
-            result
+
+            // TODO: handle result.
+            let _ = result.unwrap();
         }
 
         #[cfg(target_os = "android")]

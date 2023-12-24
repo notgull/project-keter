@@ -2,19 +2,13 @@
 
 #[cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))]
 use keter_reactor::platform::poll_io::Async;
-use keter_reactor::{exit, main, Main, Reactor};
-use macro_rules_attribute::apply;
 
 use std::io;
 #[cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))]
 use std::net::{TcpListener, TcpStream};
 
-#[apply(main!)]
-fn main(reactor: Reactor) -> Main {
-    reactor.block_on(async {
-        entry().await.unwrap();
-        exit().await
-    })
+pub(crate) async fn test() {
+    entry().await.unwrap();
 }
 
 #[cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))]
