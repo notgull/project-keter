@@ -3,6 +3,7 @@
 mod async_io;
 mod timer;
 
+use futures_lite::future;
 use keter_reactor::{exit, main, Main, Reactor};
 use macro_rules_attribute::apply;
 
@@ -12,6 +13,9 @@ fn main(reactor: Reactor) -> Main {
         let result = reactor.block_on(async {
             // Successful launch.
             harness.test("starts_up", async {}).await;
+
+            // Yield now.
+            harness.test("yield_now", future::yield_now()).await;
 
             // Group of tests.
             harness
