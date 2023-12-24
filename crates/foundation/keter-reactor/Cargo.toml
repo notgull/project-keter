@@ -20,11 +20,19 @@ path = "tests/timer.rs"
 harness = false
 
 [dependencies]
+futures-core = { version = "0.3.29", default-features = false }
+web-time = "0.2.3"
+
+[target.'cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))'.dependencies]
 async-io = "2"
 event-listener = "4.0.1"
-futures-core = { version = "0.3.29", default-features = false }
 futures-lite = { version = "2.1.0", default-features = false }
-web-time = "0.2.3"
+
+[target.'cfg(target_os = "android")'.dependencies]
+android-activity = { version = "0.5.1", default-features = false }
+event-listener = "4.0.1"
+futures-lite = { version = "2.1.0", default-features = false }
+once_cell = { version = "1.19.0", default-features = false, features = ["std"] }
 
 [target.'cfg(target_os = "linux")'.dependencies.rustix]
 version = "0.38.28"
@@ -33,3 +41,6 @@ features = ["thread", "std", "process"]
 
 [dev-dependencies]
 macro_rules_attribute = "0.2.0"
+
+[target.'cfg(target_os = "android")'.dev-dependencies]
+android-activity = { version = "0.5.1", default-features = false, features = ["native-activity"] }

@@ -1,10 +1,12 @@
 // MIT/Apache2 License
 
+#[cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))]
 use keter_reactor::platform::poll_io::Async;
 use keter_reactor::{exit, main, Main, Reactor};
 use macro_rules_attribute::apply;
 
 use std::io;
+#[cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))]
 use std::net::{TcpListener, TcpStream};
 
 #[apply(main!)]
@@ -15,6 +17,7 @@ fn main(reactor: Reactor) -> Main {
     })
 }
 
+#[cfg(all(unix, not(target_vendor = "apple"), not(target_os = "android")))]
 async fn entry() -> io::Result<()> {
     // Connect over TCP.
     let listener = Async::<TcpListener>::bind(([127, 0, 0, 1], 0))?;
@@ -37,5 +40,10 @@ async fn entry() -> io::Result<()> {
     let err = Async::<TcpStream>::connect(addr).await.unwrap_err();
     assert_eq!(err.kind(), io::ErrorKind::ConnectionRefused);
 
+    Ok(())
+}
+
+#[cfg(not(all(unix, not(target_vendor = "apple"), not(target_os = "android"))))]
+async fn entry() -> io::Result<()> {
     Ok(())
 }

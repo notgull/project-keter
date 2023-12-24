@@ -26,13 +26,14 @@ macro_rules! main {
         $(#[$attr:meta])*
         fn $name:ident ($sett:ident : $sty:ty) -> $res:ty $bl:block
     ) => {
-        fn main() {
-            use $crate::platform::instantiation::ReactorExt as _;
+        // Eat the $sty and $res items to prevent unused warnings.
+        fn __eat_types(_: $sty) -> $res {
+            panic!()
+        }
 
-            // Eat the $sty and $res items to prevent unused warnings.
-            fn __eat_types(_: $sty) -> $res {
-                panic!()
-            }
+        #[cfg(not(target_os = "android"))]
+        fn main() -> $res {
+            use $crate::platform::instantiation::ReactorExt as _;
 
             // Create the reactor and put it where we need it.
             let reactor = <$crate::Reactor as $crate::platform::instantiation::ReactorExt>::new();
@@ -40,6 +41,21 @@ macro_rules! main {
 
             // Run the block to get a result.
             let result = $bl;
+            result
+        }
+
+        #[cfg(target_os = "android")]
+        #[no_mangle]
+        fn android_main(__app: $crate::platform::android::android_activity::AndroidApp) {
+            // Create the reactor and put it where we need it.
+            let reactor = $crate::Reactor::__new(__app);
+            let $sett = reactor;
+
+            // Run the block to get a result.
+            let result = $bl;
+
+            // TODO: Handle the result properly.
+            let _ = result;
         }
     };
 }
@@ -209,6 +225,7 @@ impl Stream for Timer {
 }
 
 /// Check if a thread is the main thread.
+#[allow(dead_code)]
 #[inline]
 fn check_main_thread() -> io::Result<()> {
     if !sys::is_main_thread() {
@@ -221,11 +238,11 @@ fn check_main_thread() -> io::Result<()> {
     }
 }
 
+#[cfg(not(target_os = "android"))]
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[cfg(not(target_os = "android"))]
     #[test]
     fn not_allowed_on_any_thread() {
         use crate::platform::instantiation::ReactorExt;

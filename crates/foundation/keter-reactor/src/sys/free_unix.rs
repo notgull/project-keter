@@ -2,67 +2,16 @@
 
 //! Implementation for free-Unix systems.
 
-use event_listener::{Event, EventListener};
+#[path = "signal.rs"]
+mod signal;
+
 use futures_lite::prelude::*;
+use signal::Signal;
 
 use std::future::Future;
 use std::io;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::task::{Context, Poll};
-
-/// A signal to indicate that we are stopping.
-struct Signal {
-    /// Whether to stop running.
-    stop_running: AtomicBool,
-
-    /// The signal.
-    stop_ops: Event,
-}
-
-impl Signal {
-    /// Get the global instance of `Signal`
-    #[inline]
-    fn get() -> &'static Signal {
-        static SIGNAL: Signal = Signal {
-            stop_running: AtomicBool::new(false),
-            stop_ops: Event::new(),
-        };
-
-        &SIGNAL
-    }
-
-    /// Wait for the signal to be sent.
-    async fn wait(&self) {
-        let listener = EventListener::new();
-        futures_lite::pin!(listener);
-
-        loop {
-            // Do we need to stop running?
-            if self.stop_running.swap(false, Ordering::Relaxed) {
-                return;
-            }
-
-            // Establish the listener.
-            listener.as_mut().listen(&self.stop_ops);
-
-            // Check again.
-            if self.stop_running.swap(false, Ordering::SeqCst) {
-                return;
-            }
-
-            // Wait on the listener.
-            listener.as_mut().await;
-        }
-    }
-
-    /// Send the signal.
-    #[cold]
-    fn stop(&self) {
-        self.stop_running.store(true, Ordering::Release);
-        self.stop_ops.notify_additional(std::usize::MAX);
-    }
-}
 
 /// Run the reactor.
 pub(crate) fn block_on<T>(settings: Settings, f: impl Future<Output = T>) -> io::Result<Option<T>> {
