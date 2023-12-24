@@ -1,5 +1,9 @@
 [workspace]
-members = ["crates/foundation/keter-reactor", "crates/testing/keter-test"]
+members = [
+    "crates/foundation/keter-reactor",
+    "crates/testing/keter-test",
+    "crates/testing/keter-test-runner"
+]
 resolver = "2"
 
 [workspace.dependencies]
