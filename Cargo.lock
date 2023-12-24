@@ -495,7 +495,9 @@ dependencies = [
 name = "keter-test"
 version = "0.1.0"
 dependencies = [
+ "async-lock",
  "async-net",
+ "blocking",
  "color-eyre",
  "futures-lite",
  "human-panic",
