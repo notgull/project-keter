@@ -6,7 +6,7 @@ authors = ["John Nunley <dev@notgull.net>"]
 
 [[example]]
 name = "reactor_general_tests"
-path = "keter_tests/general_tests/main.rs"
+path = "keter_tests/general_tests/src/lib.rs"
 
 [dependencies]
 futures-core = { version = "0.3.29", default-features = false }

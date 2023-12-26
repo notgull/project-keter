@@ -1,0 +1,20 @@
+[package]
+name = "keter-reactor-general-tests-android"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+android-activity = { version = "0.5.1", default-features = false, features = ["native-activity"] }
+futures-lite = { version = "2.1.0", default-features = false }
+keter-test = { path = "../../../../testing/keter-test" }
+keter-reactor = { path = "../../" }
+macro_rules_attribute = "0.2.0"
+web-time = "0.2.3"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[workspace]
+
