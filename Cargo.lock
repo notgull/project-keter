@@ -705,9 +705,11 @@ dependencies = [
 name = "keter-test-runner"
 version = "0.1.0"
 dependencies = [
+ "async-channel",
  "async-executor",
  "async-fs",
  "async-io",
+ "async-lock 3.2.0",
  "async-process",
  "blocking",
  "clap",
@@ -719,6 +721,8 @@ dependencies = [
  "keter-test",
  "once_cell",
  "owo-colors 4.0.0",
+ "pin-project-lite",
+ "regex",
  "serde",
  "serde_json",
  "tracing",
@@ -962,6 +966,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5267fca4496028628a95160fc423a33e8b2e6af8a5302579e322e4b520293cae"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "regex"
+version = "1.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "380b951a9c5e80ddfd6136919eef32310721aa4aacd4889a8d39124b026ab343"
+dependencies = [
+ "aho-corasick",
+ "memchr",
+ "regex-automata",
+ "regex-syntax",
 ]
 
 [[package]]

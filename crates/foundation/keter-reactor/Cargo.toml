@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["John Nunley <dev@notgull.net>"]
 
 [[example]]
-name = "reactor_general_tests"
+name = "keter-reactor_general_tests"
 path = "keter_tests/general_tests/src/lib.rs"
 
 [dependencies]
